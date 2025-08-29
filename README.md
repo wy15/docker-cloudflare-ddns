@@ -1,17 +1,14 @@
-[![Travis](https://img.shields.io/travis/oznu/docker-cloudflare-ddns.svg)](https://travis-ci.org/oznu/docker-cloudflare-ddns) [![Docker Pulls](https://img.shields.io/docker/pulls/oznu/cloudflare-ddns.svg)](https://hub.docker.com/r/oznu/cloudflare-ddns/)
-
 # Docker CloudFlare DDNS
 
 This small Alpine Linux based Docker image will allow you to use the free [CloudFlare DNS Service](https://www.cloudflare.com/dns/) as a Dynamic DNS Provider ([DDNS](https://en.wikipedia.org/wiki/Dynamic_DNS)).
 
-This is a multi-arch image and will run on amd64, aarch64, and armhf devices, including the Raspberry Pi.
+This is a multi-arch image and will run on amd64, aarch64 devices, including the Raspberry Pi.
 
 ## Image Variants
 
 | Image Tag      | Architecture  | OS            | Size   |
 | :------------- | :-------------| :------------ | :----  |
 | latest         | x64           | Alpine Linux  | [![](https://images.microbadger.com/badges/image/oznu/cloudflare-ddns.svg)](https://microbadger.com/images/oznu/cloudflare-ddns) |
-| armhf          | arm32v6       | Alpine Linux  | [![](https://images.microbadger.com/badges/image/oznu/cloudflare-ddns:armhf.svg)](https://microbadger.com/images/oznu/cloudflare-ddns:armhf) |
 | aarch64        | arm64         | Alpine Linux  | [![](https://images.microbadger.com/badges/image/oznu/cloudflare-ddns:aarch64.svg)](https://microbadger.com/images/oznu/cloudflare-ddns:aarch64) |
 
 ## Usage
@@ -77,7 +74,6 @@ If you're wanting to set IPv6 records set the envrionment variable `RRTYPE=AAAA`
 If you prefer to use [Docker Compose](https://docs.docker.com/compose/):
 
 ```yml
-version: '2'
 services:
   cloudflare-ddns:
     image: oznu/cloudflare-ddns:latest
