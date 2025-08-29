@@ -1,4 +1,4 @@
-FROM ghcr.io/wy15/docker-s6-alpine:nightly
+FROM ghcr.io/wy15/docker-s6-alpine:master
 
 RUN apk add --no-cache jq curl bind-tools
 
