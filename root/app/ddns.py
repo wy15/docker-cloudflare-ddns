@@ -6,7 +6,7 @@ import json
 import logging
 import argparse
 import subprocess
-import socket
+import time
 import requests
 from typing import Optional
 
@@ -242,15 +242,25 @@ def update():
 
 
 
+def run():
+    setup()
+    import schedule
+    schedule.every(5).minutes.do(update)
+    while True:
+        schedule.run_pending()
+        time.sleep(60)
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=['setup', 'update'])
+    parser.add_argument('action', choices=['setup', 'update', 'run'])
     args = parser.parse_args()
 
     if args.action == 'setup':
         setup()
     elif args.action == 'update':
         update()
+    elif args.action == 'run':
+        run()
 
 if __name__ == '__main__':
     main()
