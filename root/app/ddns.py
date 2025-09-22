@@ -111,55 +111,86 @@ def get_dns_record_ip(zone_id: str, record_id: str) -> Optional[str]:
 def get_public_ip(rrtype: str) -> Optional[str]:
     if rrtype == 'A':
         # Try Cloudflare DNS
+        logging.info("Trying Cloudflare DNS for IPv4")
         try:
             result = subprocess.run(['dig', '+short', f'@{DNS_SERVER}', 'ch', 'txt', 'whoami.cloudflare'], capture_output=True, text=True, timeout=5)
             ip = result.stdout.strip().strip('"')
-            if len(ip) <= 15:  # IPv4 length
+            if ip and len(ip) <= 15:  # IPv4 length
+                logging.info(f"Got IP from Cloudflare DNS: {ip}")
                 return ip
-        except:
-            pass
+        except Exception as e:
+            logging.warning(f"Cloudflare DNS failed: {e}")
         # Fallback to OpenDNS
+        logging.info("Trying OpenDNS for IPv4")
         try:
             result = subprocess.run(['dig', '+short', 'myip.opendns.com', '@resolver1.opendns.com'], capture_output=True, text=True, timeout=5)
-            return result.stdout.strip()
-        except:
-            pass
+            ip = result.stdout.strip()
+            if ip:
+                logging.info(f"Got IP from OpenDNS: {ip}")
+                return ip
+        except Exception as e:
+            logging.warning(f"OpenDNS failed: {e}")
         # HTTP fallback
+        logging.info("Trying HTTP fallback for IPv4")
         try:
             resp = requests.get('https://ipinfo.io', timeout=5)
-            return resp.json().get('ip')
-        except:
-            return None
+            ip = resp.json().get('ip')
+            if ip:
+                logging.info(f"Got IP from ipinfo.io: {ip}")
+                return ip
+        except Exception as e:
+            logging.warning(f"HTTP fallback failed: {e}")
+        logging.error("All IPv4 IP detection methods failed")
+        return None
     elif rrtype == 'AAAA':
         # IPv6
+        logging.info("Trying Cloudflare DNS for IPv6")
         try:
             result = subprocess.run(['dig', '+short', '@2606:4700:4700::1111', '-6', 'ch', 'txt', 'whoami.cloudflare'], capture_output=True, text=True, timeout=5)
             ip = result.stdout.strip().strip('"')
-            return ip
-        except:
-            pass
+            if ip:
+                logging.info(f"Got IPv6 from Cloudflare DNS: {ip}")
+                return ip
+        except Exception as e:
+            logging.warning(f"Cloudflare IPv6 DNS failed: {e}")
         # HTTP fallback
+        logging.info("Trying HTTP fallback for IPv6")
         try:
             resp = requests.get('https://ifconfig.co', timeout=5)
-            return resp.text.strip()
-        except:
-            return None
+            ip = resp.text.strip()
+            if ip:
+                logging.info(f"Got IPv6 from ifconfig.co: {ip}")
+                return ip
+        except Exception as e:
+            logging.warning(f"HTTP IPv6 fallback failed: {e}")
+        logging.error("All IPv6 IP detection methods failed")
+        return None
     return None
 
 
 
 def get_custom_ip(cmd: str) -> Optional[str]:
+    logging.info(f"Running custom IP command: {cmd}")
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=10)
-        return result.stdout.strip()
-    except:
-        return None
+        ip = result.stdout.strip()
+        if ip:
+            logging.info(f"Got IP from custom command: {ip}")
+            return ip
+        else:
+            logging.warning("Custom command returned empty output")
+    except Exception as e:
+        logging.error(f"Custom command failed: {e}")
+    return None
 
 def get_current_ip() -> Optional[str]:
     if CUSTOM_LOOKUP_CMD:
-        return get_custom_ip(CUSTOM_LOOKUP_CMD)
+        ip = get_custom_ip(CUSTOM_LOOKUP_CMD)
     else:
-        return get_public_ip(RRTYPE)
+        ip = get_public_ip(RRTYPE)
+    if not ip:
+        logging.error("Failed to get current IP")
+    return ip
 
 def get_dns_name() -> str:
     assert ZONE is not None
