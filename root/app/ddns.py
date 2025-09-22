@@ -207,10 +207,7 @@ def setup():
     with open('/config/cloudflare.conf', 'w') as f:
         json.dump(config, f)
 
-    # Set cron
-    cron_line = f"{os.getenv('CRON', '*/5 * * * *')}\t/etc/cont-init.d/50-ddns\n"
-    with open('/var/spool/cron/crontabs/root', 'w') as f:
-        f.write(cron_line)
+
 
 def update():
     if not os.path.exists('/config/cloudflare.conf'):
