@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 CF_API = os.getenv('CF_API', 'https://api.cloudflare.com/client/v4')
 RRTYPE = os.getenv('RRTYPE', 'A')
 PROXIED = os.getenv('PROXIED', 'false').lower() == 'true'
-DELETE_ON_STOP = os.getenv('DELETE_ON_STOP', 'false').lower() == 'true'
+
 DNS_SERVER = os.getenv('DNS_SERVER', '1.1.1.1')
 CUSTOM_LOOKUP_CMD = os.getenv('CUSTOM_LOOKUP_CMD')
 
@@ -240,38 +240,17 @@ def update():
     else:
         logging.info(f"No update needed for {dns_name} ({dns_ip})")
 
-def cleanup():
-    if not os.path.exists('/config/cloudflare.conf'):
-        return
 
-    with open('/config/cloudflare.conf', 'r') as f:
-        config = json.load(f)
-
-    if not DELETE_ON_STOP:
-        logging.info("DNS record deletion disabled")
-        return
-
-    zone_id = config['CF_ZONE_ID']
-    record_id = config['CF_RECORD_ID']
-    dns_name = config['CF_RECORD_NAME']
-
-    logging.info(f"Deleting DNS record {dns_name}")
-    if delete_dns_record(zone_id, record_id):
-        logging.info("DNS record deleted successfully")
-    else:
-        logging.error("Failed to delete DNS record")
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=['setup', 'update', 'cleanup'])
+    parser.add_argument('action', choices=['setup', 'update'])
     args = parser.parse_args()
 
     if args.action == 'setup':
         setup()
     elif args.action == 'update':
         update()
-    elif args.action == 'cleanup':
-        cleanup()
 
 if __name__ == '__main__':
     main()
