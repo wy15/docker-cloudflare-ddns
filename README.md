@@ -1,17 +1,8 @@
 # Docker CloudFlare DDNS
 
-This small Alpine Linux based Docker image will allow you to use the free [CloudFlare DNS Service](https://www.cloudflare.com/dns/) as a Dynamic DNS Provider ([DDNS](https://en.wikipedia.org/wiki/Dynamic_DNS)).
+This small Python-based Docker image allows you to use the free [CloudFlare DNS Service](https://www.cloudflare.com/dns/) as a Dynamic DNS Provider ([DDNS](https://en.wikipedia.org/wiki/Dynamic_DNS)).
 
-This is a multi-arch image and will run on amd64, aarch64 devices, including the Raspberry Pi.
-
-The application is written in Python for better stability and maintainability.
-
-## Image Variants
-
-| Image Tag      | Architecture  | OS            | Size   |
-| :------------- | :-------------| :------------ | :----  |
-| latest         | x64           | Alpine Linux  | [![](https://images.microbadger.com/badges/image/oznu/cloudflare-ddns.svg)](https://microbadger.com/images/oznu/cloudflare-ddns) |
-| aarch64        | arm64         | Alpine Linux  | [![](https://images.microbadger.com/badges/image/oznu/cloudflare-ddns:aarch64.svg)](https://microbadger.com/images/oznu/cloudflare-ddns:aarch64) |
+The application is written in Python for better stability and maintainability. This refactor was assisted by Grok Code (opencode.ai), an AI-powered coding tool.
 
 ## Usage
 
@@ -22,7 +13,7 @@ docker run \
   -e API_KEY=xxxxxxx \
   -e ZONE=example.com \
   -e SUBDOMAIN=subdomain \
-  oznu/cloudflare-ddns
+  your-custom-image
 ```
 
 ## Parameters
@@ -39,14 +30,8 @@ docker run \
 
 * `-e PROXIED` - Set to `true` to make traffic go through the CloudFlare CDN. Defaults to `false`.
 * `-e RRTYPE=A` - Set to `AAAA` to use set IPv6 records instead of IPv4 records. Defaults to `A` for IPv4 records.
-
-
 * `-e CUSTOM_LOOKUP_CMD="curl -s https://api.ipify.org"` - Set to any shell command to run and get the IP from stdout. Useful if default methods fail in your network.
 * `-e DNS_SERVER=10.0.0.2` - Set to the IP address of the DNS server you would like to use. Defaults to 1.1.1.1 otherwise.
-
-## Depreciated Parameters
-
-* `-e EMAIL` - Your CloudFlare email address when using an Account-level token. This variable MUST NOT be set when using a scoped API token.
 
 ## Creating a Cloudflare API token
 
@@ -62,13 +47,9 @@ To create a CloudFlare API token for your DNS zone go to https://dash.cloudflare
     * Include - All zones
 5. Complete the wizard and copy the generated token into the `API_KEY` variable for the container
 
-## Multiple Domains
+## IPv6 Support
 
-If you need multiple records pointing to your public IP address you can create CNAME records in CloudFlare.
-
-## IPv6
-
-If you're wanting to set IPv6 records set the envrionment variable `RRTYPE=AAAA`. You will also need to run docker with IPv6 support, or run the container with host networking enabled.
+If you're wanting to set IPv6 records set the environment variable `RRTYPE=AAAA`. Ensure your network supports IPv6.
 
 ## Docker Compose
 
@@ -77,7 +58,7 @@ If you prefer to use [Docker Compose](https://docs.docker.com/compose/):
 ```yml
 services:
   cloudflare-ddns:
-    image: oznu/cloudflare-ddns:latest
+    image: your-custom-image
     restart: always
     environment:
       - API_KEY=xxxxxxx
@@ -86,10 +67,17 @@ services:
       - PROXIED=false
 ```
 
+## Acknowledgments
+
+Thanks to oznu for the original shell-based implementation.
+
 ## License
 
-Copyright (C) 2017-2020 oznu
+Copyright (C) 2017-2020 oznu  
+Copyright (C) 2025 wy
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the [GNU General Public License](./LICENSE) for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the [GNU General Public License](./LICENSE) for more details.</content>
+</xai:function_call ><xai:function_call name="bash">
+<parameter name="command">cd /Volumes/T5/work/2025/docker-cloudflare-ddns && git add README.md && git commit -m "Update README: remove outdated content, add Grok Code info, simplify for Python refactor"
