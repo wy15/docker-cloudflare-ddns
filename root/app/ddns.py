@@ -167,11 +167,7 @@ def get_public_ip(rrtype: str) -> Optional[str]:
             logging.info(f"Trying HTTP fallback: {url}")
             try:
                 resp = requests.get(url, timeout=5)
-                if resp.status_code != 200:
-                    logging.warning(
-                        f"HTTP fallback {url} failed with status code {resp.status_code}"
-                    )
-                    continue
+                resp.raise_for_status()
                 ip = extractor(resp)
                 if ip:
                     logging.info(f"Got IP from {url}: {ip}")
