@@ -17,7 +17,6 @@ RRTYPE = os.getenv('RRTYPE', 'A')
 PROXIED = os.getenv('PROXIED', 'false').lower() == 'true'
 DELETE_ON_STOP = os.getenv('DELETE_ON_STOP', 'false').lower() == 'true'
 DNS_SERVER = os.getenv('DNS_SERVER', '1.1.1.1')
-INTERFACE = os.getenv('INTERFACE')
 CUSTOM_LOOKUP_CMD = os.getenv('CUSTOM_LOOKUP_CMD')
 
 def load_from_file(file_path: Optional[str]) -> Optional[str]:
@@ -147,17 +146,7 @@ def get_public_ip(rrtype: str) -> Optional[str]:
             return None
     return None
 
-def get_local_ip(interface: str, rrtype: str) -> Optional[str]:
-    try:
-        af = 'inet' if rrtype == 'A' else 'inet6'
-        result = subprocess.run(['ip', 'addr', 'show', interface], capture_output=True, text=True, timeout=5)
-        for line in result.stdout.splitlines():
-            if line.strip().startswith(af):
-                ip = line.split()[1].split('/')[0]
-                return ip
-    except:
-        return None
-    return None
+
 
 def get_custom_ip(cmd: str) -> Optional[str]:
     try:
@@ -169,8 +158,6 @@ def get_custom_ip(cmd: str) -> Optional[str]:
 def get_current_ip() -> Optional[str]:
     if CUSTOM_LOOKUP_CMD:
         return get_custom_ip(CUSTOM_LOOKUP_CMD)
-    elif INTERFACE:
-        return get_local_ip(INTERFACE, RRTYPE)
     else:
         return get_public_ip(RRTYPE)
 
