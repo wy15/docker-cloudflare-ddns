@@ -149,13 +149,15 @@ def get_public_ip(rrtype: str) -> Optional[str]:
 
 def get_local_ip(interface: str, rrtype: str) -> Optional[str]:
     try:
-        family = socket.AF_INET if rrtype == 'A' else socket.AF_INET6
-        with socket.socket(family, socket.SOCK_DGRAM) as s:
-            s.connect(('8.8.8.8', 80))
-            ip = s.getsockname()[0]
-            return ip
+        af = 'inet' if rrtype == 'A' else 'inet6'
+        result = subprocess.run(['ip', 'addr', 'show', interface], capture_output=True, text=True, timeout=5)
+        for line in result.stdout.splitlines():
+            if line.strip().startswith(af):
+                ip = line.split()[1].split('/')[0]
+                return ip
     except:
         return None
+    return None
 
 def get_custom_ip(cmd: str) -> Optional[str]:
     try:

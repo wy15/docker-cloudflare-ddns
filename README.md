@@ -4,6 +4,8 @@ This small Alpine Linux based Docker image will allow you to use the free [Cloud
 
 This is a multi-arch image and will run on amd64, aarch64 devices, including the Raspberry Pi.
 
+The application is written in Python for better stability and maintainability.
+
 ## Image Variants
 
 | Image Tag      | Architecture  | OS            | Size   |
