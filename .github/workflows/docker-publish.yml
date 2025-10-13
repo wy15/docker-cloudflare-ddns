@@ -99,3 +99,13 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+        
+      - name: Create GitHub Release
+        if: github.event_name == 'schedule'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: monthly-release-${{ github.run_id }}
+          name: "Monthly Release ${{ github.run_id }}"
+          body: "This is an automated monthly release containing the built Docker image."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
