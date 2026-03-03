@@ -10,6 +10,7 @@ import time
 from typing import Optional
 
 import requests
+from typing_extensions import ChainMap
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -34,6 +35,8 @@ API_KEY = load_from_file(os.getenv("API_KEY_FILE")) or os.getenv("API_KEY")
 ZONE = load_from_file(os.getenv("ZONE_FILE")) or os.getenv("ZONE")
 SUBDOMAIN = load_from_file(os.getenv("SUBDOMAIN_FILE")) or os.getenv("SUBDOMAIN")
 EMAIL = os.getenv("EMAIL")
+
+CACHE_DNS_IP = None
 
 
 def get_headers():
@@ -312,21 +315,35 @@ def update():
     record_id = config["CF_RECORD_ID"]
     dns_name = config["CF_RECORD_NAME"]
 
-    dns_ip = get_dns_record_ip(zone_id, record_id)
     current_ip = get_current_ip()
 
     if not current_ip:
         logging.error("Failed to get current IP")
         return
 
-    if current_ip != dns_ip:
-        logging.info(f"Updating DNS record {dns_name} from {dns_ip} to {current_ip}")
+    # cache dns ip
+    global CACHE_DNS_IP
+
+    if not CACHE_DNS_IP:
+        dns_ip = get_dns_record_ip(zone_id, record_id)
+
+        if not dns_ip:
+            logging.error("Failed to get DNS IP")
+            return
+
+        CACHE_DNS_IP = dns_ip
+
+    if current_ip != CACHE_DNS_IP:
+        logging.info(
+            f"Updating DNS record {dns_name} from {CACHE_DNS_IP} to {current_ip}"
+        )
         if update_dns_record(zone_id, record_id, dns_name, current_ip, RRTYPE, PROXIED):
-            logging.info(f"DNS record updated successfully")
+            CACHE_DNS_IP = current_ip
+            logging.info("DNS record updated successfully")
         else:
             logging.error("Failed to update DNS record")
     else:
-        logging.info(f"No update needed for {dns_name} ({dns_ip})")
+        logging.info(f"No update needed for {dns_name} ({CACHE_DNS_IP})")
 
 
 def run():
