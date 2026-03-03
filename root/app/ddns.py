@@ -10,7 +10,6 @@ import time
 from typing import Optional
 
 import requests
-from typing_extensions import ChainMap
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
